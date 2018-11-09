@@ -1,0 +1,29 @@
+{   
+    "characters":3,
+    "characters_list":
+        [{
+            "farmer":{
+                
+                "name":"Farmer",
+                "tolarance":15,
+                "numbers":1,
+                "game_end_on_death":true    
+            },
+            "cow":{
+                
+                "name":"Cow",
+                "tolarance":10,
+                "numbers":4,
+                "game_end_on_death":false
+            },
+            "bunny":{
+                
+                "name":"Bunny",
+                "tolarance":8,
+                "numbers":4,
+                "game_end_on_death":false
+            }
+        }],
+    "max_turns":50,
+    "turn_cost":1
+}
