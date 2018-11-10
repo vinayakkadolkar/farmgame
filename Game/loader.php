@@ -1,6 +1,14 @@
 <?php
 namespace Game;
 
+/**
+ * Class Loader
+ * 
+ * The class is used to mainly load default settings before starting the gane and 
+ * create necessory data to continue using
+ * 
+ *
+ */
 class Loader    
 {
     private $default_configs_file="../settings/fgconfigs.json";
@@ -15,12 +23,14 @@ class Loader
 
     }
 
-    public function loadDefaults()
-    {
-        # code...
-    }
-
-    public function create_new_game()
+    /**
+	 * Function loadDefaults
+     * 
+     * function use to load default values from json file
+     * 
+	 *
+	*/
+    private function load_defaults()
     {
         $defaults=array();
         try{
@@ -29,10 +39,16 @@ class Loader
             $this->error_message[]="failed to Load default Game Configurations";
             return false;
         }
+        return $defaults;
+    }
+
+    public function create_new_game()
+    {
         $gameSettings=array();
+        $defaults=$this->load_defaults();
         $gameSettings['turn']=0;
         $gameSettings['turn_cost']=$defaults['turn_cost'];
-        $gameSettings['max_turns']=$defaults['maz_turns'];
+        $gameSettings['max_turns']=$defaults['max_turns'];
         $charactersList=$this->create_characters($defaults["characters_list"]);
         if(!$charactersList){
             $this->error_message[]="Failed to Load Characters in Game";
@@ -58,7 +74,7 @@ class Loader
         {
             for ($numbers=1; $numbers <= $character['numbers']; $numbers++) 
             { 
-                $characters[]=array(
+                $characters[$char_code."_".$numbers]=array(
                     'code'=>$char_code."_".$numbers,
                     'type'=>$char_code,
                     'name'=>$character['name']."_".$numbers,

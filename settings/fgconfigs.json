@@ -13,7 +13,7 @@
                 
                 "name":"Cow",
                 "tolarance":10,
-                "numbers":4,
+                "numbers":2,
                 "game_end_on_death":false
             },
             "bunny":{
