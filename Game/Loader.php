@@ -14,35 +14,41 @@ class Loader
     
     public $default_configs_file = "/settings/fgconfigs.json";
     public $save_file="/settings/fgsave.json";
-    public $error_message = array();
+    public $error_message=false ;
+    
     /**
-	 * Function __Construct
-	 *
-	*/
-    public function __construct()
-    {
-
-    }
-
-    /**
-	 * Function loadDefaults
-     * 
-     * function use to load default values from json file
-     * 
-	 *
-	*/
+	  * Function load_defaults
+	  * function used to load default values when we start new game
+	  *
+	  * @package farmgame
+	  * @author Vinayak
+	  * @return object $defaults
+	  *
+	  */
     private function load_defaults()
     {
         $defaults=array();
         try{
             $defaults=json_decode(file_get_contents(dirname(dirname(__FILE__)).$this->default_configs_file));
         }catch(Exception $e){
-            $this->error_message[]="failed to Load default Game Configurations";
+            $this->error_message="failed to Load default Game Configurations";
             return false;
         }
         return $defaults;
     }
 
+
+    /**
+	  * Function create_new_game
+      * function used to create and load new game 
+      *
+      * Funtion will not take any argument and create new save file to start a game. 
+	  *
+	  * @package farmgame
+	  * @author Vinayak
+	  * @return boolean 
+	  *
+	  */
     public function create_new_game()
     {
         $gameSettings=array();
@@ -60,12 +66,25 @@ class Loader
         try{
             file_put_contents(dirname(dirname(__FILE__)).$this->save_file,json_encode($gameSettings));
         }catch(Exception $e){
-            $this->error_message[]="Failed to save the Game";
+            $this->error_message="Failed to save the Game";
             return false;
         }
 
+      
     }
 
+    /**
+	  * Function create_characters
+      * function used to create all characters in the game 
+      *
+      * Funtion will get raw list of characters and result into simple list of objects
+	  *
+	  * @package farmgame
+      * @author Vinayak
+      * @param object $character_raw_list
+	  * @return array $characters
+	  *
+	  */
     private function create_characters($character_raw_list)
     {   
         if(empty($character_raw_list)){

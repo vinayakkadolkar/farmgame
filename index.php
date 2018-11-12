@@ -16,6 +16,10 @@ $win=false;
 if(isset($_GET['playing']) && $_GET['playing']==1){
     $playing=true;
     $saveData=$game->read_save_file();
+    if($game->error_message){
+        $game_end = true;
+        $end_message=$game->error_message;
+    }
     // Check if Game is running
     if(!$saveData){
         //Start new Game, Load New values to start
@@ -24,10 +28,23 @@ if(isset($_GET['playing']) && $_GET['playing']==1){
         }
         $loader=new Loader();
         $new_game=$loader->create_new_game();
-        $game_data=$game->read_save_file();
+        if($game->error_message){
+            $game_end = true;
+            $end_message=$game->error_message;
+        }else{
+            $game_data=$game->read_save_file();
+            if($game->error_message){
+                $game_end = true;
+                $end_message=$game->error_message;
+            }
+        }
     }else{
         //Section for Running Game
         $game_data=$game->read_save_file();
+        if($game->error_message){
+            $game_end = true;
+            $end_message=$game->error_message;
+        }
         if(isset($_GET['turn']) && $_GET['turn']==1){
             if($game_data->max_turns<=$game_data->turn){
                 $game_end = true;
@@ -36,30 +53,39 @@ if(isset($_GET['playing']) && $_GET['playing']==1){
                 $end_message="Congratulations you won the game";
             }
             $living_characters=$game->get_live_characters($game_data);
-            if(count($living_characters)<2){
+            if(count($living_characters)<3){
                 $game_end = true;
                 $game_data->end=true;
-                $end_message="Only one character left in Game resulted in your loss";
+                $end_message="All essential character died in Game resulted in your loss";
+            }else{
+                $characters_count=array_count_values($living_characters);
+                if(count($characters_count)<3)
+                {
+                    $game_end = true;
+                    $game_data->end=true;
+                    $end_message="All essential character died in Game resulted in your loss";
+                }
             }
-            //echo "<pre>"; print_r($living_characters);exit;
+            
             $feed_to = array_rand($living_characters);
-            //echo $feed_to;exit;
             //Update Json Data
             $game_data->turn+=1;
              
             foreach ($game_data->characters as $gckey => $gcvalue) {
-                //echo $gckey;
+                //check whom to feed on this turn
                 if($feed_to==$gckey){
                     $game_data->characters->{$gckey}->tolarated=0;
-                    //echo "Eating ".$gckey;
+                    
                 }else{
                     $game_data->characters->{$gckey}->tolarated+=1;
                 }
+
+                //check if tolarance is reached to thrshould where character death is imminent
                 if($game_data->characters->{$gckey}->tolarated==$game_data->characters->{$gckey}->tolarance)
                 {
                     $game_data->characters->{$gckey}->dead=true;
                     $game_data->characters->{$gckey}->death_turn=$game_data->turn;
-                    $game_data->characters->{$gckey}->status = "dead";
+                    $game_data->characters->{$gckey}->status = "Dead";
                     if($game_data->characters->{$gckey}->game_end_on_death){
                         $game_end = true;
                         $game_data->end=true;
@@ -75,18 +101,26 @@ if(isset($_GET['playing']) && $_GET['playing']==1){
 
             }
             
+            //Check if game is ended failing conditions of game
             if($game_data->end)
             {
                 $result_data=$game_data;
                 $game_data=array();
                 $game->clean_save();
+
             }else{
                 $game->write_save_file($game_data);
+                if($game->error_message){
+                  $game_end = true;
+                  $end_message=$game->error_message;
+                }
+                
             }
         }
-        //echo "<pre>"; print_r($game_data);exit;
+        
     }
 }else{
+    //Clear the save to start the new game
     $game->clean_save();
 }
 ?>
@@ -165,7 +199,8 @@ if(isset($_GET['playing']) && $_GET['playing']==1){
                 if($character->type=="farmer")
                 {
                     $life=(($character->tolarance-$character->tolarated) / $character->tolarance )*100;
-                    $status=($life<30)? "progress-bar-danger": ($life<50)?"progress-bar-warning" : "progress-bar-success";
+                    $status=($life<50)?"progress-bar-warning" : "progress-bar-success";
+                    $status=($life<30)? "progress-bar-danger": $status;
           ?>
             
                 <div class="panel panel-default">
@@ -201,7 +236,8 @@ if(isset($_GET['playing']) && $_GET['playing']==1){
               if($character->type=="cow")
               {
                   $life=(($character->tolarance-$character->tolarated) / $character->tolarance )*100;
-                  $status=($life<30)? "progress-bar-danger": ($life<50)?"progress-bar-warning" : "progress-bar-success";
+                  $status=($life<50)?"progress-bar-warning" : "progress-bar-success";
+                  $status=($life<30)? "progress-bar-danger": $status;
           ?>
           
               <div class="panel panel-default">
@@ -237,7 +273,8 @@ if(isset($_GET['playing']) && $_GET['playing']==1){
                 if($character->type=="bunny")
                 {
                     $life=(($character->tolarance-$character->tolarated) / $character->tolarance )*100;
-                    $status=($life<=20)? "progress-bar-danger": ($life<50)?"progress-bar-warning" : "progress-bar-success";
+                    $status=($life<50)?"progress-bar-warning" : "progress-bar-success";
+                    $status=($life<30)? "progress-bar-danger": $status;
           ?>
             
                 <div class="panel panel-default">
@@ -274,13 +311,13 @@ if(isset($_GET['playing']) && $_GET['playing']==1){
         ?>
         <div class="col-xs-3 col-md-2">
             <?php if($playing && !$game_end){ ?>
-            <a href="index.php?playing=1&turn=1" class="btn btn-default btn-lg">
+            <a href="index.php?playing=1&turn=1" class="btn btn-primary btn-lg">
               <span class="glyphicon glyphicon-hourglass" aria-hidden="true"></span> Next Turn
             </a>
             <?php }else{ ?>
 
-            <a href="index.php?playing=1" class="btn btn-default btn-lg">
-              <span class="glyphicon glyphicon-hourglass" aria-hidden="true"></span> Start Game
+            <a href="index.php?playing=1" class="btn btn-success btn-lg">
+              <span class="glyphicon glyphicon-hourglass" aria-hidden="true"></span> Start New Game
             </a>  
             <?php } ?>  
 
