@@ -35,7 +35,6 @@ class Loader
     {
         $defaults=array();
         try{
-            echo dirname(dirname(__FILE__)).$this->default_configs_file;
             $defaults=json_decode(file_get_contents(dirname(dirname(__FILE__)).$this->default_configs_file));
         }catch(Exception $e){
             $this->error_message[]="failed to Load default Game Configurations";
@@ -86,7 +85,8 @@ class Loader
                     'tolarated'=>0,
                     'game_end_on_death'=>$character->game_end_on_death,
                     'dead'=>false,
-                    'death_turn'=>0
+                    'death_turn'=>0,
+                    'status'=>"idle"
                 );
             }
         }

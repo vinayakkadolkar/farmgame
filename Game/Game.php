@@ -55,4 +55,21 @@ class Game
         }
     }
 
+    public function redirect($url) {
+        ob_start();
+        header('Location: '.$url);
+        ob_end_flush();
+        die();
+    }
+
+    public function clean_save()
+    {
+        try{
+            file_put_contents(dirname(dirname(__FILE__)).$this->game_loader->save_file,"");
+        }catch(Exception $e){
+            $this->error_message[]="Failed to clean the Game";
+            return false;
+        }
+    }
+
 }
