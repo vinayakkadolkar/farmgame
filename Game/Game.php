@@ -48,7 +48,7 @@ class Game
     public function write_save_file($data)
     {
         try{
-            file_put_contents($this->game_loader->save_file,json_encode($data));
+            file_put_contents(dirname(dirname(__FILE__)).$this->game_loader->save_file,json_encode($data));
         }catch(Exception $e){
             $this->error_message[]="Failed to save the Game";
             return false;
@@ -70,6 +70,18 @@ class Game
             $this->error_message[]="Failed to clean the Game";
             return false;
         }
+    }
+
+    public function get_live_characters($data)
+    {
+        $codes=array();
+        foreach ($data->characters as $key => $value) {
+            if(!$value->dead){
+                $codes[$key]=$key;
+            }
+        }
+        //echo "<pre>"; print_r($codes);exit;
+        return $codes;
     }
 
 }

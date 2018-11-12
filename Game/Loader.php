@@ -50,6 +50,7 @@ class Loader
         $gameSettings['turn']=0;
         $gameSettings['turn_cost']=$defaults->turn_cost;
         $gameSettings['max_turns']=$defaults->max_turns;
+        $gameSettings['end']=false;
         $charactersList=$this->create_characters($defaults->characters_list);
         if(!$charactersList){
             $this->error_message[]="Failed to Load Characters in Game";
@@ -80,7 +81,7 @@ class Loader
                 $characters[$char_code."_".$numbers]=array(
                     'code'=>$char_code."_".$numbers,
                     'type'=>$char_code,
-                    'name'=>$character->name."_".$numbers,
+                    'name'=>$character->name." ".$numbers,
                     'tolarance'=>$character->tolarance,
                     'tolarated'=>0,
                     'game_end_on_death'=>$character->game_end_on_death,
