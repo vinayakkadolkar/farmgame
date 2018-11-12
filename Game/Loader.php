@@ -1,5 +1,5 @@
 <?php
-namespace Game;
+//namespace Game;
 
 /**
  * Class Loader
@@ -10,9 +10,10 @@ namespace Game;
  *
  */
 class Loader    
-{
-    private $default_configs_file="../settings/fgconfigs.json";
-    public $save_file="../settings/fgsave.json";
+{   
+    
+    public $default_configs_file = "/settings/fgconfigs.json";
+    public $save_file="/settings/fgsave.json";
     public $error_message = array();
     /**
 	 * Function __Construct
@@ -34,8 +35,9 @@ class Loader
     {
         $defaults=array();
         try{
-            $defaults=json_decode(file_get_contents($this->default_configs_file));
-        }catch(exception $e){
+            echo dirname(dirname(__FILE__)).$this->default_configs_file;
+            $defaults=json_decode(file_get_contents(dirname(dirname(__FILE__)).$this->default_configs_file));
+        }catch(Exception $e){
             $this->error_message[]="failed to Load default Game Configurations";
             return false;
         }
@@ -47,17 +49,17 @@ class Loader
         $gameSettings=array();
         $defaults=$this->load_defaults();
         $gameSettings['turn']=0;
-        $gameSettings['turn_cost']=$defaults['turn_cost'];
-        $gameSettings['max_turns']=$defaults['max_turns'];
-        $charactersList=$this->create_characters($defaults["characters_list"]);
+        $gameSettings['turn_cost']=$defaults->turn_cost;
+        $gameSettings['max_turns']=$defaults->max_turns;
+        $charactersList=$this->create_characters($defaults->characters_list);
         if(!$charactersList){
             $this->error_message[]="Failed to Load Characters in Game";
             return false;
         }
         $gameSettings['characters']=$charactersList;
         try{
-            file_put_contents($this->save_file,json_encode($gameSettings));
-        }catch(exception $e){
+            file_put_contents(dirname(dirname(__FILE__)).$this->save_file,json_encode($gameSettings));
+        }catch(Exception $e){
             $this->error_message[]="Failed to save the Game";
             return false;
         }
@@ -71,16 +73,18 @@ class Loader
         }
         $characters=array();
         foreach ($character_raw_list as $char_code  => $character) 
-        {
-            for ($numbers=1; $numbers <= $character['numbers']; $numbers++) 
+        {   
+           
+            $numbers=1;
+            for ($numbers=1; $numbers <= $character->numbers; $numbers++) 
             { 
                 $characters[$char_code."_".$numbers]=array(
                     'code'=>$char_code."_".$numbers,
                     'type'=>$char_code,
-                    'name'=>$character['name']."_".$numbers,
-                    'tolarance'=>$character['tolarance'],
+                    'name'=>$character->name."_".$numbers,
+                    'tolarance'=>$character->tolarance,
                     'tolarated'=>0,
-                    'game_end_on_death'=>$character['game_end_on_death'],
+                    'game_end_on_death'=>$character->game_end_on_death,
                     'dead'=>false,
                     'death_turn'=>0
                 );

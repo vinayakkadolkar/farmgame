@@ -1,7 +1,7 @@
 {   
     "characters":3,
     "characters_list":
-        [{
+        {
             "farmer":{
                 
                 "name":"Farmer",
@@ -23,7 +23,7 @@
                 "numbers":4,
                 "game_end_on_death":false
             }
-        }],
+        },
     "max_turns":50,
     "turn_cost":1
 }

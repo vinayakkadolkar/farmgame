@@ -1,0 +1,58 @@
+<?php
+//namespace Game;
+
+require "Loader.php";
+
+/**
+ * Class Loader
+ * 
+ * The class is used to mainly load default settings before starting the gane and 
+ * create necessory data to continue using
+ * 
+ *
+ */
+class Game    
+{
+    
+    var $game_loader;
+
+    public function __construct()
+    {
+        $this->game_loader=new Loader();
+    }
+
+
+    public function update_turn_data($data)
+    {
+        # code...
+    }
+
+    public function read_saved_data()
+    {
+        
+    }
+
+    public function read_save_file()
+    {
+        $save_data=array();
+        try{
+            //echo __DIR__ .$this->game_loader->save_file;
+            $save_data=json_decode(file_get_contents(dirname(dirname(__FILE__)).$this->game_loader->save_file));
+        }catch(Exception $e){
+            $this->error_message[]="failed to Get saved Game Configurations";
+            return false;
+        }
+        return $save_data;        
+    }
+
+    public function write_save_file($data)
+    {
+        try{
+            file_put_contents($this->game_loader->save_file,json_encode($data));
+        }catch(Exception $e){
+            $this->error_message[]="Failed to save the Game";
+            return false;
+        }
+    }
+
+}
